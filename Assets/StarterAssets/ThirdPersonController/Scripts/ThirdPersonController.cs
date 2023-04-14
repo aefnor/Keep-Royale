@@ -105,7 +105,7 @@ namespace StarterAssets
         private Animator _animator;
         private CharacterController _controller;
         private StarterAssetsInputs _input;
-        private GameObject _mainCamera;
+        [SerializeField] private GameObject _mainCamera;
 
         private const float _threshold = 0.01f;
 
@@ -129,7 +129,9 @@ namespace StarterAssets
             // get a reference to our main camera
             if (_mainCamera == null)
             {
-                _mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
+                if(this.GetComponent<NetworkObject>().IsLocalPlayer){
+                    _mainCamera = GameObject.FindGameObjectWithTag("PlayerCamera");
+                }
             }
         }
 
@@ -155,6 +157,8 @@ namespace StarterAssets
 
         private void Update()
         {
+            Debug.Log(IsOwner + " " + IsLocalPlayer + " " + OwnerClientId);
+
             if (!IsOwner) return;
 
             _hasAnimator = TryGetComponent(out _animator);

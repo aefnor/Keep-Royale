@@ -1,13 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.Netcode;
 using UnityEngine;
 
-public class TeamManagerNetwork : NetworkBehaviour
+public class SpawnPointManager : MonoBehaviour
 {
-    public NetworkVariable<int> data = new NetworkVariable<int>(1);
-    
     // Start is called before the first frame update
+    [SerializeField] public List<GameObject> spawnPoints;
     void Start()
     {
         

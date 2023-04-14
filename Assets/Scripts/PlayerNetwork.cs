@@ -20,6 +20,7 @@ public class PlayerNetwork : NetworkBehaviour
     [SerializeField] private Transform spawnObjectPrefab;
     [SerializeField] private GameObject playerCamera;
     [SerializeField] private GameObject teamManagerObject;
+    [SerializeField] private GameObject spawnPointManager;
     private TeamManagerNetwork teamManager;
     private Transform spawnedObjectTransform;
 
@@ -34,11 +35,28 @@ public class PlayerNetwork : NetworkBehaviour
         teamManager = teamManagerObject.GetComponent<TeamManagerNetwork>();
     }
 
-    public override void OnNetworkSpawn()
-    {
+    private void SetPlayerSpawn() {
+        //Set's the position based off the spawn object
+        List<GameObject> spawnPoints = spawnPointManager.GetComponent<SpawnPointManager>().spawnPoints.FindAll(x => x.GetComponent<SpawnPoint>().spawnData.Value.hasPlayerSpawned != true);
+        Debug.Log(spawnPoints + " " + spawnPointManager.GetComponent<SpawnPointManager>().spawnPoints.Count + " " + spawnPointManager.GetComponent<SpawnPointManager>().spawnPoints[0].GetComponent<SpawnPoint>().spawnData.Value.hasPlayerSpawned);
+        if(spawnPoints.Count <= 0) return;
+        Debug.Log("ASDASDADSDS");
+
+        GameObject spawnPoint = spawnPoints[Random.Range(0,spawnPoints.Count)];
+        spawnPoint.GetComponent<SpawnPoint>().spawnData.Value = new SpawnPoint.MyCustomData { hasPlayerSpawned = true};
+        this.transform.position = spawnPoint.transform.position;
+    }
+
+    private void SetPlayerCamera(){
         playerCamera = Instantiate(playerCamera);
         playerCamera.GetComponent<NetworkObject>().Spawn(true);
-        
+    }
+    
+    public override void OnNetworkSpawn()
+    {
+        SetPlayerSpawn();
+        SetPlayerCamera();
+
         Debug.Log("PLAYER HAS SPAWNED: " + OwnerClientId);
 
         data.OnValueChanged = (MyCustomData previousValue, MyCustomData currentValue) =>
@@ -48,6 +66,9 @@ public class PlayerNetwork : NetworkBehaviour
     }
 
     public void LateUpdate () {
+
+        
+
         Vector3 offset = new Vector3(0,-2,3);
         if (!this.GetComponent<NetworkObject>().IsLocalPlayer)
         {
