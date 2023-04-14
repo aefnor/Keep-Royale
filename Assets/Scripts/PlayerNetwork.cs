@@ -10,7 +10,7 @@ public class PlayerNetwork : NetworkBehaviour
     struct MyCustomData : INetworkSerializable
     {
         public FixedString512Bytes message;
-
+        
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
             serializer.SerializeValue(ref message);
@@ -18,6 +18,9 @@ public class PlayerNetwork : NetworkBehaviour
     }
 
     [SerializeField] private Transform spawnObjectPrefab;
+    [SerializeField] private GameObject playerCamera;
+    [SerializeField] private GameObject teamManagerObject;
+    private TeamManagerNetwork teamManager;
     private Transform spawnedObjectTransform;
 
     private NetworkVariable<MyCustomData> data = new NetworkVariable<MyCustomData>(new MyCustomData { message = "" });
@@ -26,13 +29,38 @@ public class PlayerNetwork : NetworkBehaviour
     {
         
     }
+    private void Awake()
+    {
+        teamManager = teamManagerObject.GetComponent<TeamManagerNetwork>();
+    }
 
     public override void OnNetworkSpawn()
     {
+        playerCamera = Instantiate(playerCamera);
+        playerCamera.GetComponent<NetworkObject>().Spawn(true);
+        
+        Debug.Log("PLAYER HAS SPAWNED: " + OwnerClientId);
+
         data.OnValueChanged = (MyCustomData previousValue, MyCustomData currentValue) =>
         {
-            Debug.Log(OwnerClientId + " " +currentValue.message);
+            Debug.Log("PLAYER HAS SPAWNED: " + OwnerClientId + " " +currentValue.message);
         };
+    }
+
+    public void LateUpdate () {
+        Vector3 offset = new Vector3(0,-2,3);
+        if (!this.GetComponent<NetworkObject>().IsLocalPlayer)
+        {
+            Debug.Log("disabled camera" + OwnerClientId);
+            playerCamera.GetComponent<Camera>().enabled = false;
+            playerCamera.GetComponent<AudioListener>().enabled = false;
+        }
+        else  {
+            Debug.Log("enabled camera" + OwnerClientId);
+            playerCamera.GetComponent<Camera>().enabled = true;
+            playerCamera.GetComponent<AudioListener>().enabled = true;
+        }
+        playerCamera.transform.position = this.transform.position - offset;
     }
 
     // Update is called once per frame
@@ -41,6 +69,11 @@ public class PlayerNetwork : NetworkBehaviour
         //Cant run code if script not attached to the owner
         if (!IsOwner) return;
 
+        if (Input.GetKeyDown(KeyCode.H))
+        {
+            teamManager.data.Value = 5;
+            Debug.Log(teamManager.data.Value);
+        }
 
         if (Input.GetKeyDown(KeyCode.Y))
         {

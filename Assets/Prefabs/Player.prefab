@@ -64,6 +64,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnObjectPrefab: {fileID: 3584596312660548863, guid: b5aed3fd8cfb5d341b56dbf75e05cf2a, type: 3}
+  playerCamera: {fileID: 6475015778297041425, guid: ae3e5c8f13b4de14f84b64323a1c681a, type: 3}
+  teamManagerObject: {fileID: 1450364326317593338, guid: e4aaf094d23464b429344d8c63c0f95d, type: 3}
 --- !u!114 &1230343517744516139
 MonoBehaviour:
   m_ObjectHideFlags: 0
