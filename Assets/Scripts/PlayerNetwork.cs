@@ -92,8 +92,9 @@ public class PlayerNetwork : NetworkBehaviour
 
         if (Input.GetKeyDown(KeyCode.H))
         {
-            teamManager.data.Value = 5;
-            Debug.Log(teamManager.data.Value);
+            // teamManager.data.Value = 5;
+            // Debug.Log(teamManager.data.Value);
+            teamManager.AddPlayerData(new PlayerData{playerName = "test", clientId = OwnerClientId});
         }
 
         if (Input.GetKeyDown(KeyCode.Y))
